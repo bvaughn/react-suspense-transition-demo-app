@@ -37,3 +37,25 @@
   border: 2px solid gray;
   color: gray;
 }
+
+/** code **/
+.Code {
+  background-color: #1a1a1a;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+}
+.code-line {
+  display: block;
+  white-space: pre;
+}
+.code-keyword {
+  color: lightblue;
+}
+.code-comment {
+  color: gray;
+}
+.code-variable {
+}
+.code-special {
+  color: violet;
+}

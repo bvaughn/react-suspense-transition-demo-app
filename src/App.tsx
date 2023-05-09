@@ -3,10 +3,6 @@ import "./App.css";
 
 type UpdateType = "update" | "transition" | "deferred";
 
-const CODE_DEFERRED = `const deferredValue = useDeferredValue(value)`;
-const CODE_TRANSITION = `startTransition(() => setValue(value));`;
-const CODE_UPDATE = `setValue(value);`;
-
 export default function App() {
   const [defaultCount, setDefaultCount] = useState(0);
   const [transitionCount, setTransitionCount] = useState(0);
@@ -119,11 +115,11 @@ function Fallback() {
 function Code({ updateType }: { updateType: UpdateType | null }) {
   switch (updateType) {
     case "deferred":
-      return <pre className="Code">{CODE_DEFERRED}</pre>;
+      return CODE_DEFERRED;
     case "transition":
-      return <pre className="Code">{CODE_TRANSITION}</pre>;
+      return CODE_TRANSITION;
     case "update":
-      return <pre className="Code">{CODE_UPDATE}</pre>;
+      return CODE_UPDATE;
     default:
       return null;
   }
@@ -163,3 +159,95 @@ function fauxSuspense(value: number): number {
     throw data.promise;
   }
 }
+
+// Syntax stuff
+
+const CODE_DEFERRED = (
+  <pre className="Code">
+    <div className="code-line">
+      <span className="code-keyword">const</span>{" "}
+      <span className="code-variable">onClick</span>
+      {" = "}
+      <span className="code-special">()</span>
+      {" => "}
+      <span className="code-special">{"{"}</span>
+    </div>
+    <div className="code-line">
+      {"  setValue("}
+      <span className="code-comment">...</span>
+      {");"}
+    </div>
+    <div className="code-line">
+      <span className="code-special">{"}"}</span>;
+    </div>
+    <div className="code-line"> </div>
+    <div className="code-line">
+      <span className="code-comment">// Suspend on this value</span>
+    </div>
+    <div className="code-line">
+      <span className="code-keyword">const</span>{" "}
+      <span className="code-variable">deferredValue</span>
+      {" = useDeferredValue(value);"}
+    </div>
+  </pre>
+);
+const CODE_TRANSITION = (
+  <pre className="Code">
+    <div className="code-line">
+      <span className="code-keyword">const</span>{" "}
+      <span className="code-variable">onClick</span>
+      {" = "}
+      <span className="code-special">()</span>
+      {" => "}
+      <span className="code-special">{"{"}</span>
+    </div>
+    <div className="code-line">
+      {"  startTransition"}
+      <span className="code-special">{"(()"}</span>
+      {" => "}
+      <span className="code-special">{"{"}</span>
+    </div>
+    <div className="code-line">
+      {"    "}
+      <span className="code-comment">// Suspend on this value</span>
+    </div>
+    <div className="code-line">
+      {"    setValue("}
+      <span className="code-comment">...</span>
+      {");"}
+    </div>
+    <div className="code-line">
+      <span className="code-special">{"  }"}</span>;
+    </div>
+    <div className="code-line"> </div>
+    <span className="code-comment">
+      {"  // Other default priority updates ..."}
+    </span>
+    <div className="code-line">
+      <span className="code-special">{"}"}</span>;
+    </div>
+  </pre>
+);
+const CODE_UPDATE = (
+  <pre className="Code">
+    <div className="code-line">
+      <span className="code-keyword">const</span>{" "}
+      <span className="code-variable">onClick</span>
+      {" = "}
+      <span className="code-special">()</span>
+      {" => "}
+      <span className="code-special">{"{"}</span>
+    </div>
+    <div className="code-line">
+      <span className="code-comment">{"  // Suspend on this value"}</span>
+    </div>
+    <div className="code-line">
+      {"  setValue("}
+      <span className="code-comment">...</span>
+      {");"}
+    </div>
+    <div className="code-line">
+      <span className="code-special">{"}"}</span>;
+    </div>
+  </pre>
+);
