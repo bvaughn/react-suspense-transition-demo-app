@@ -1,0 +1,42 @@
+.tok-comment {
+    color: #666;
+  }
+  .tok-definition {
+    color:  #fefefe;
+  }
+  .tok-local {
+    color: #fefefe;
+  }
+  .tok-keyword {
+    color: #ff7aad;
+  }
+  .tok-meta {
+    color: #8237bb;
+  }
+  .tok-number {
+    color: #ffdc7a;
+  }
+  .tok-operator {
+    color: #fefefe;
+  }
+  .tok-propertyName {
+    color: #ff98eb;
+  }
+  .tok-punctuation {
+    color: #dcadff;
+  }
+  .tok-string {
+    color: #7ac1ff;
+  }
+  .tok-string2 {
+    color: #7ac1ff;
+  }
+  .tok-typeName {
+    color: #c67bff;
+  }
+  .tok-variableName:not(.tok-definition) {
+    color: #c67bff;
+  }
+  .tok-variableName2 {
+    color: #c67bff;
+  }

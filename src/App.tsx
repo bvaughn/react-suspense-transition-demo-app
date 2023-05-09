@@ -1,5 +1,7 @@
 import { Suspense, startTransition, useDeferredValue, useState } from "react";
 import "./App.css";
+import { Code } from "./Code";
+import { syntaxParsingCache } from "./suspense/SyntaxParsingCache";
 
 type UpdateType = "update" | "transition" | "deferred";
 
@@ -9,6 +11,7 @@ export default function App() {
   const deferredCount = useDeferredValue(defaultCount);
 
   const [mounted, setMounted] = useState(false);
+  const [code, setCode] = useState("");
   const [updateType, setUpdateType] = useState<UpdateType | null>(null);
 
   const mount = () => setMounted(true);
@@ -16,6 +19,7 @@ export default function App() {
     setDefaultCount(defaultCount + 1);
     setTransitionCount(defaultCount + 1);
     setUpdateType("update");
+    setCode(CODE_UPDATE);
   };
   const updateTransition = () => {
     startTransition(() => {
@@ -23,17 +27,20 @@ export default function App() {
     });
     setDefaultCount(defaultCount + 1);
     setUpdateType("transition");
+    setCode(CODE_TRANSITION);
   };
   const updateDeferred = () => {
     setDefaultCount(defaultCount + 1);
     setTransitionCount(defaultCount + 1);
     setUpdateType("deferred");
+    setCode(CODE_DEFERRED);
   };
   const reset = () => {
     suspenseMap.clear();
     setMounted(false);
     setDefaultCount(0);
     setTransitionCount(0);
+    setCode("");
   };
 
   let count = 0;
@@ -90,7 +97,7 @@ export default function App() {
         <button onClick={resolve}>Resolve pending</button>
       </div>
 
-      <Code updateType={updateType} />
+      <ExampleCode code={code} />
     </div>
   );
 }
@@ -112,17 +119,8 @@ function Fallback() {
   return <div className="Fallback">Loading...</div>;
 }
 
-function Code({ updateType }: { updateType: UpdateType | null }) {
-  switch (updateType) {
-    case "deferred":
-      return CODE_DEFERRED;
-    case "transition":
-      return CODE_TRANSITION;
-    case "update":
-      return CODE_UPDATE;
-    default:
-      return null;
-  }
+function ExampleCode({ code }: { code: string }) {
+  return code ? <Code className="Code" code={code} /> : null;
 }
 
 // Side effect land
@@ -162,92 +160,31 @@ function fauxSuspense(value: number): number {
 
 // Syntax stuff
 
-const CODE_DEFERRED = (
-  <pre className="Code">
-    <div className="code-line">
-      <span className="code-keyword">const</span>{" "}
-      <span className="code-variable">onClick</span>
-      {" = "}
-      <span className="code-special">()</span>
-      {" => "}
-      <span className="code-special">{"{"}</span>
-    </div>
-    <div className="code-line">
-      {"  setValue("}
-      <span className="code-comment">...</span>
-      {");"}
-    </div>
-    <div className="code-line">
-      <span className="code-special">{"}"}</span>;
-    </div>
-    <div className="code-line"> </div>
-    <div className="code-line">
-      <span className="code-comment">// Suspend on this value</span>
-    </div>
-    <div className="code-line">
-      <span className="code-keyword">const</span>{" "}
-      <span className="code-variable">deferredValue</span>
-      {" = useDeferredValue(value);"}
-    </div>
-  </pre>
-);
-const CODE_TRANSITION = (
-  <pre className="Code">
-    <div className="code-line">
-      <span className="code-keyword">const</span>{" "}
-      <span className="code-variable">onClick</span>
-      {" = "}
-      <span className="code-special">()</span>
-      {" => "}
-      <span className="code-special">{"{"}</span>
-    </div>
-    <div className="code-line">
-      {"  startTransition"}
-      <span className="code-special">{"(()"}</span>
-      {" => "}
-      <span className="code-special">{"{"}</span>
-    </div>
-    <div className="code-line">
-      {"    "}
-      <span className="code-comment">// Suspend on this value</span>
-    </div>
-    <div className="code-line">
-      {"    setValue("}
-      <span className="code-comment">...</span>
-      {");"}
-    </div>
-    <div className="code-line">
-      <span className="code-special">{"  }"}</span>;
-    </div>
-    <div className="code-line"> </div>
-    <span className="code-comment">
-      {"  // Other default priority updates ..."}
-    </span>
-    <div className="code-line">
-      <span className="code-special">{"}"}</span>;
-    </div>
-  </pre>
-);
-const CODE_UPDATE = (
-  <pre className="Code">
-    <div className="code-line">
-      <span className="code-keyword">const</span>{" "}
-      <span className="code-variable">onClick</span>
-      {" = "}
-      <span className="code-special">()</span>
-      {" => "}
-      <span className="code-special">{"{"}</span>
-    </div>
-    <div className="code-line">
-      <span className="code-comment">{"  // Suspend on this value"}</span>
-    </div>
-    <div className="code-line">
-      {"  setValue("}
-      <span className="code-comment">...</span>
-      {");"}
-    </div>
-    <div className="code-line">
-      <span className="code-special">{"}"}</span>;
-    </div>
-  </pre>
-);
+const CODE_DEFERRED = `
+const onClick = () => {
+  setValue(...);
+};
+ 
+// Suspend on this value
+const deferredValue = useDeferredValue(value);
+`;
+const CODE_TRANSITION = `
+const onClick = () => {
+  startTransition(() => {
+    // Suspend on this value
+    setValue(...);
+  };
+ 
+  // Other default priority updates ...
+};
+`;
+const CODE_UPDATE = `
+const onClick = () => {
+  // Suspend on this value
+  setValue(...);
+};
+`;
+
+syntaxParsingCache.prefetch(CODE_DEFERRED);
+syntaxParsingCache.prefetch(CODE_TRANSITION);
+syntaxParsingCache.prefetch(CODE_UPDATE);

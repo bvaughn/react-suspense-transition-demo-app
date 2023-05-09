@@ -10,12 +10,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react": "0.0.0-experimental-7ac5e9a60-20230508",
+    "react-dom": "0.0.0-experimental-7ac5e9a60-20230508",
+    "suspense": "^0.0.37"
   },
   "devDependencies": {
-    "@types/react": "^18.0.28",
-    "@types/react-dom": "^18.0.11",
+    "@codemirror/lang-css": "latest",
+    "@codemirror/lang-html": "latest",
+    "@codemirror/lang-javascript": "latest",
+    "@codemirror/lang-markdown": "latest",
+    "@codemirror/language": "latest",
+    "@codemirror/state": "latest",
+    "@lezer/highlight": "latest",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
     "@vitejs/plugin-react": "^4.0.0",
