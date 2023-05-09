@@ -1,5 +1,11 @@
-import { Suspense, useDeferredValue, useState, useTransition } from "react";
+import { Suspense, startTransition, useDeferredValue, useState } from "react";
 import "./App.css";
+
+type UpdateType = "update" | "transition" | "deferred";
+
+const CODE_DEFERRED = `const deferredValue = useDeferredValue(value)`;
+const CODE_TRANSITION = `startTransition(() => setValue(value));`;
+const CODE_UPDATE = `setValue(value);`;
 
 export default function App() {
   const [defaultCount, setDefaultCount] = useState(0);
@@ -7,11 +13,7 @@ export default function App() {
   const deferredCount = useDeferredValue(defaultCount);
 
   const [mounted, setMounted] = useState(false);
-  const [updateType, setUpdateType] = useState<
-    "update" | "transition" | "deferred"
-  >("update");
-
-  const [isPending, startTransition] = useTransition();
+  const [updateType, setUpdateType] = useState<UpdateType | null>(null);
 
   const mount = () => setMounted(true);
   const update = () => {
@@ -91,6 +93,8 @@ export default function App() {
       <div className="Row">
         <button onClick={resolve}>Resolve pending</button>
       </div>
+
+      <Code updateType={updateType} />
     </div>
   );
 }
@@ -111,6 +115,21 @@ function Component({ count }: { count: number }) {
 function Fallback() {
   return <div className="Fallback">Loading...</div>;
 }
+
+function Code({ updateType }: { updateType: UpdateType | null }) {
+  switch (updateType) {
+    case "deferred":
+      return <pre className="Code">{CODE_DEFERRED}</pre>;
+    case "transition":
+      return <pre className="Code">{CODE_TRANSITION}</pre>;
+    case "update":
+      return <pre className="Code">{CODE_UPDATE}</pre>;
+    default:
+      return null;
+  }
+}
+
+// Side effect land
 
 const suspenseMap: Map<
   number,
