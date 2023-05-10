@@ -1,4 +1,4 @@
-import { Suspense, startTransition, useDeferredValue, useState } from "react";
+import { Suspense, useDeferredValue, useState, useTransition } from "react";
 import "./App.css";
 import { Code } from "./Code";
 import { syntaxParsingCache } from "./suspense/SyntaxParsingCache";
@@ -9,6 +9,8 @@ export default function App() {
   const [defaultCount, setDefaultCount] = useState(0);
   const [transitionCount, setTransitionCount] = useState(0);
   const deferredCount = useDeferredValue(defaultCount);
+
+  const [isPending, startTransition] = useTransition();
 
   const [mounted, setMounted] = useState(false);
   const [code, setCode] = useState("");
@@ -73,7 +75,7 @@ export default function App() {
         <button disabled={!mounted} onClick={update}>
           Update
         </button>
-        <button disabled={!mounted} onClick={updateTransition}>
+        <button disabled={!mounted || isPending} onClick={updateTransition}>
           Update (startTransition)
         </button>
         <button disabled={!mounted} onClick={updateDeferred}>
@@ -169,6 +171,8 @@ const onClick = () => {
 const deferredValue = useDeferredValue(value);
 `;
 const CODE_TRANSITION = `
+const [isPending, startTransition] = useTransition();
+
 const onClick = () => {
   startTransition(() => {
     // Suspend on this value
