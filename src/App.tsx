@@ -58,6 +58,9 @@ export default function App() {
       break;
   }
 
+  const isDeferredPending =
+    updateType === "deferred" && defaultCount !== deferredCount;
+
   const resolve = () => {
     const data = suspenseMap.get(suspendedCount);
     if (data && data.resolvedValue === null) {
@@ -78,7 +81,10 @@ export default function App() {
         <button disabled={!mounted || isPending} onClick={updateTransition}>
           Update (startTransition)
         </button>
-        <button disabled={!mounted} onClick={updateDeferred}>
+        <button
+          disabled={!mounted || isDeferredPending}
+          onClick={updateDeferred}
+        >
           Update (useDeferredValue)
         </button>
         :
@@ -169,6 +175,8 @@ const onClick = () => {
  
 // Suspend on this value
 const deferredValue = useDeferredValue(value);
+
+const isPending = value !== deferredValue;
 `;
 const CODE_TRANSITION = `
 const [isPending, startTransition] = useTransition();
